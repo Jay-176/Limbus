@@ -1,4 +1,4 @@
-from ddgs import DDGS
+from duckduckgo_search import DDGS
 import asyncio
 from crawl4ai import AsyncWebCrawler
 
