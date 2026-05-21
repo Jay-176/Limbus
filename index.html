@@ -1,0 +1,270 @@
+<!DOCTYPE html><html class="light" lang="en" style=""><head>
+<meta charset="utf-8">
+<meta content="width=device-width, initial-scale=1.0" name="viewport">
+<title>Limbus AI Research Dashboard</title>
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 128 128' fill='none'%3E%3Cpath d='M32 84C32 84 16 84 16 68C16 52 32 48 40 40C48 32 60 24 80 24C100 24 112 40 112 56C112 72 96 84 96 84' stroke='%2318181b' stroke-width='8' stroke-linecap='square' stroke-linejoin='miter'/%3E%3Cpath d='M16 84H112' stroke='%2318181b' stroke-width='8' stroke-linecap='square'/%3E%3Ccircle cx='64' cy='64' r='12' fill='%237e69ab'/%3E%3Cpath d='M64 52V24' stroke='%2318181b' stroke-width='4' stroke-linecap='square'/%3E%3Cpath d='M64 76V84' stroke='%2318181b' stroke-width='4' stroke-linecap='square'/%3E%3C/svg%3E">
+<script src="https://cdn.tailwindcss.com?plugins=forms,typography"></script>
+<script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@100..900&display=swap" rel="stylesheet">
+
+<script id="tailwind-config">
+    tailwind.config = {
+        darkMode: "class",
+        theme: {
+            extend: {
+                colors: {
+                    "surface-container-low": "#f8f2f8",
+                    "surface-bright": "#fef7fe",
+                    "surface-container-highest": "#e6e1e7",
+                    "outline-variant": "#cbc4d0",
+                    "primary": "#655090",
+                    "primary-container": "#7e69ab",
+                    "surface": "#fef7fe",
+                    "surface-container-high": "#ece6ed",
+                    "on-surface": "#1d1b1f",
+                    "on-surface-variant": "#49454f"
+                },
+                fontFamily: {
+                    "body-md": ["Geist"],
+                    "headline-sm": ["Geist"]
+                }
+            }
+        }
+    }
+</script>
+<style>
+    .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; }
+    ::-webkit-scrollbar { width: 4px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: #e6e1e7; border-radius: 4px; }
+    
+    /* Smooth fade in for the modal */
+    .fade-in { animation: fadeIn 0.2s ease-out forwards; }
+    @keyframes fadeIn {
+        from { opacity: 0; transform: scale(0.95); }
+        to { opacity: 1; transform: scale(1); }
+    }
+</style>
+</head>
+<body class="bg-surface text-on-surface font-body-md min-h-screen flex antialiased">
+
+<nav class="w-[260px] h-screen fixed left-0 top-0 bg-zinc-950 border-r border-zinc-800 flex flex-col py-6 px-4 z-20 md:flex hidden">
+    
+    <div class="flex items-center gap-3 mb-12 px-2">
+        <div class="w-10 h-10 flex items-center justify-center">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" fill="none" class="w-full h-full drop-shadow-md">
+              <path d="M32 84C32 84 16 84 16 68C16 52 32 48 40 40C48 32 60 24 80 24C100 24 112 40 112 56C112 72 96 84 96 84" stroke="#f4f4f5" stroke-width="8" stroke-linecap="square" stroke-linejoin="miter"/>
+              <path d="M16 84H112" stroke="#f4f4f5" stroke-width="8" stroke-linecap="square"/>
+              
+              <circle cx="64" cy="64" r="12" fill="#7e69ab"/>
+              
+              <path d="M64 52V24" stroke="#f4f4f5" stroke-width="4" stroke-linecap="square"/>
+              <path d="M64 76V84" stroke="#f4f4f5" stroke-width="4" stroke-linecap="square"/>
+            </svg>
+        </div>
+        <span class="text-2xl font-bold text-zinc-100 tracking-tight">Limbus</span>
+    </div>
+    
+    <div class="mb-6">
+        <div class="text-xs text-zinc-500 mb-2 uppercase tracking-wider px-2">Terminal Status</div>
+        <div class="flex flex-col gap-2">
+            <div class="flex items-center gap-2 bg-zinc-900 border border-zinc-800 rounded px-2 py-1.5 w-max">
+                <div class="w-2 h-2 rounded-full bg-emerald-500"></div>
+                <span class="text-xs text-zinc-300">Brain: Online</span>
+            </div>
+            <div class="flex items-center gap-2 bg-zinc-900 border border-zinc-800 rounded px-2 py-1.5 w-max">
+                <div class="w-2 h-2 rounded-full bg-sky-400"></div>
+                <span class="text-xs text-zinc-300">Scraper: Active</span>
+            </div>
+        </div>
+    </div>
+    
+    <div class="flex-1 flex flex-col gap-1 mt-4">
+        <div class="text-xs text-zinc-500 mb-2 uppercase tracking-wider px-2">Workspace</div>
+        <a class="flex items-center gap-3 px-3 py-2 text-zinc-400 hover:bg-zinc-900 hover:text-zinc-100 rounded-md transition-colors" href="#">
+            <span class="material-symbols-outlined text-[18px]">biotech</span>
+            <span class="text-sm">Research Lab</span>
+        </a>
+        <button onclick="clearHistory()" class="flex items-center gap-3 px-3 py-2 text-red-400/70 hover:bg-red-500/10 hover:text-red-400 rounded-md transition-colors w-full text-left">
+            <span class="material-symbols-outlined text-[18px]">delete</span>
+            <span class="text-sm">Clear Terminal</span>
+        </button>
+    </div>
+
+    <button onclick="openModal()" class="mt-6 pt-4 border-t border-zinc-800 flex items-center gap-3 w-full hover:bg-zinc-900 p-2 rounded-md transition-all text-left group">
+        <div class="w-9 h-9 rounded-full bg-zinc-800 group-hover:bg-primary-container flex items-center justify-center text-zinc-300 group-hover:text-white font-bold text-sm transition-colors border border-zinc-700 group-hover:border-primary-container">JP</div>
+        <div class="flex-1">
+            <span class="text-sm font-medium text-zinc-100 block">Jay Pandya</span>
+            <span class="text-xs text-zinc-500 block">About Developer</span>
+        </div>
+        <span class="material-symbols-outlined text-zinc-600 group-hover:text-zinc-300 text-[18px] transition-colors">info</span>
+    </button>
+</nav>
+
+<main class="flex-1 ml-0 md:ml-[260px] flex flex-col h-screen relative bg-surface-bright">
+    
+    <div class="flex-1 overflow-y-auto p-4 md:p-8 flex flex-col items-center" id="chat-window">
+        <div id="chat-box" class="w-full max-w-[800px] flex flex-col gap-6">
+            </div>
+        <div class="h-40 w-full flex-shrink-0"></div>
+    </div>
+
+    <div class="absolute bottom-6 left-0 right-0 px-4 md:px-8 flex justify-center z-10 pointer-events-none">
+        <div class="w-full max-w-[800px] pointer-events-auto">
+            <div class="bg-surface border border-outline-variant/50 shadow-lg rounded-full flex items-center p-2 transition-all duration-300 focus-within:border-sky-400 bg-white">
+                <input id="prompt-input" class="flex-1 bg-transparent border-none focus:ring-0 text-on-surface text-sm px-4 outline-none" placeholder="Ask Limbus to research a topic..." type="text" onkeypress="if(event.key === 'Enter') sendPrompt()">
+                <button id="send-btn" onclick="sendPrompt()" class="p-2 bg-primary-container text-white hover:bg-primary transition-colors rounded-full ml-2 shadow-sm flex items-center justify-center h-8 w-8">
+                    <span class="material-symbols-outlined text-[18px] font-bold">arrow_upward</span>
+                </button>
+            </div>
+            <div class="text-center mt-2">
+                <span class="text-xs text-on-surface-variant/60">Limbus AI autonomous terminal.</span>
+            </div>
+        </div>
+    </div>
+</main>
+
+<div id="about-modal" class="hidden fixed inset-0 bg-zinc-950/40 backdrop-blur-sm z-50 flex items-center justify-center">
+    <div class="bg-white border border-zinc-200 rounded-2xl p-8 max-w-md w-full mx-4 shadow-2xl relative fade-in">
+        <button onclick="closeModal()" class="absolute top-4 right-4 text-zinc-400 hover:text-zinc-800 transition-colors p-1">
+            <span class="material-symbols-outlined">close</span>
+        </button>
+        
+        <div class="flex items-center gap-5 mb-6">
+            <div class="w-16 h-16 rounded-full bg-primary-container flex items-center justify-center text-white font-bold text-2xl shadow-inner">JP</div>
+            <div>
+                <h2 class="text-xl font-bold text-zinc-900 tracking-tight">Jay Pandya</h2>
+                <p class="text-sm font-medium text-primary-container">Creator & Lead Architect</p>
+            </div>
+        </div>
+        
+        <div class="prose prose-sm prose-zinc leading-relaxed">
+            <p>I am a BTech Computer Science Engineering student specializing in <strong>Artificial Intelligence and Data Science</strong> at Marwadi University.</p>
+            <p>Limbus is my latest exploration into autonomous deep-web research and full-stack API architecture. I am passionate about applied AI, computer vision, and building seamless software solutions.</p>
+            <p>When I'm not coding, you can find me sketching, gaming, or experimenting with new tech. I built Limbus to push the boundaries of what AI agents can do in terms of real-time information retrieval and synthesis.</p>
+            <p>If you're interested in collaborating or just want to chat about AI, feel free to reach out!</p>
+            <p>Feel free to connect with me on <a href="https://www.linkedin.com/in/jay-pandya-026022326/" class="text-primary hover:underline" target="_blank">LinkedIn</a></p>
+            <p class="text-xs text-zinc-500 mt-4 pt-4 border-t border-zinc-100">Other projects include: <em>Gesture Shooter</em>, <em>Air Canvas</em>, <em>CineMatch</em>, and <em>SpendScout</em>.</p>
+        </div>
+        
+        <div class="mt-8 flex justify-end">
+            <button onclick="closeModal()" class="px-5 py-2 bg-zinc-100 hover:bg-zinc-200 text-zinc-900 rounded-lg text-sm font-medium transition-colors">Return to Terminal</button>
+        </div>
+    </div>
+</div>
+
+<script>
+    const chatBox = document.getElementById('chat-box');
+    const input = document.getElementById('prompt-input');
+    const chatWindow = document.getElementById('chat-window');
+    const modal = document.getElementById('about-modal');
+
+    // Modal Control Functions
+    function openModal() { modal.classList.remove('hidden'); }
+    function closeModal() { modal.classList.add('hidden'); }
+    modal.addEventListener('click', function(e) { if(e.target === modal) closeModal(); });
+
+    // The Custom SVG Limbus Avatar (Dark lines for the light background)
+    const aiAvatarHTML = `
+        <div class="flex-shrink-0 mt-1">
+            <div class="w-8 h-8 rounded-lg bg-white border border-zinc-200 flex items-center justify-center shadow-sm p-1">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" fill="none" class="w-full h-full">
+                  <path d="M32 84C32 84 16 84 16 68C16 52 32 48 40 40C48 32 60 24 80 24C100 24 112 40 112 56C112 72 96 84 96 84" stroke="#18181b" stroke-width="8" stroke-linecap="square" stroke-linejoin="miter"/>
+                  <path d="M16 84H112" stroke="#18181b" stroke-width="8" stroke-linecap="square"/>
+                  <circle cx="64" cy="64" r="12" fill="#7e69ab"/>
+                  <path d="M64 52V24" stroke="#18181b" stroke-width="4" stroke-linecap="square"/>
+                  <path d="M64 76V84" stroke="#18181b" stroke-width="4" stroke-linecap="square"/>
+                </svg>
+            </div>
+        </div>
+    `;
+
+    // --- INCOGNITO MEMORY MANAGEMENT (Using sessionStorage) ---
+    let conversation = JSON.parse(sessionStorage.getItem('limbus_history')) || [];
+
+    function renderConversation() {
+        chatBox.innerHTML = ''; 
+        
+        if (conversation.length === 0) {
+            chatBox.innerHTML = `
+            <div class="flex items-start gap-4 w-full">
+                ${aiAvatarHTML}
+                <div class="flex-1 flex flex-col gap-4 text-on-surface max-w-prose">
+                    <p class="mt-1">Hello I am Limbus  All systems are online. What topic are we deep-diving into today?</p>
+                </div>
+            </div>`;
+        } else {
+            conversation.forEach(msg => {
+                if (msg.role === 'user') {
+                    chatBox.innerHTML += `
+                    <div class="flex justify-end w-full mt-4">
+                        <div class="bg-zinc-100 text-zinc-900 border border-zinc-200 px-5 py-3 rounded-2xl rounded-tr-sm max-w-[85%] shadow-sm">
+                            <p class="text-sm font-medium">${msg.content}</p>
+                        </div>
+                    </div>`;
+                } else {
+                    const formattedHTML = marked.parse(msg.content);
+                    chatBox.innerHTML += `
+                    <div class="flex items-start gap-4 w-full mt-4">
+                        ${aiAvatarHTML}
+                        <div class="flex-1 flex flex-col gap-4 text-on-surface max-w-prose">
+                            <div class="prose prose-sm prose-zinc max-w-none leading-relaxed mt-1">${formattedHTML}</div>
+                        </div>
+                    </div>`;
+                }
+            });
+        }
+        chatWindow.scrollTop = chatWindow.scrollHeight;
+    }
+
+    function clearHistory() {
+        sessionStorage.removeItem('limbus_history');
+        conversation = [];
+        renderConversation();
+    }
+
+    renderConversation();
+
+    // --- SEND LOGIC ---
+    async function sendPrompt() {
+        const text = input.value.trim();
+        if(!text) return;
+        
+        input.value = '';
+        
+        // Save user message to memory
+        conversation.push({ role: 'user', content: text });
+        sessionStorage.setItem('limbus_history', JSON.stringify(conversation));
+        renderConversation();
+
+        // Add loading state
+        const loadingId = 'loading-' + Date.now();
+        chatBox.innerHTML += `
+        <div class="flex items-start gap-4 w-full mt-4" id="${loadingId}">
+            ${aiAvatarHTML}
+            <div class="flex-1 flex flex-col text-on-surface-variant max-w-prose">
+                <p class="text-sm italic mt-1 animate-pulse">Scouring the web and formatting data...</p>
+            </div>
+        </div>`;
+        chatWindow.scrollTop = chatWindow.scrollHeight;
+
+        try {
+            const response = await fetch('/api/research', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ prompt: text })
+            });
+            const data = await response.json();
+            
+            // Save AI response to memory
+            conversation.push({ role: 'ai', content: data.response });
+            sessionStorage.setItem('limbus_history', JSON.stringify(conversation));
+            renderConversation();
+            
+        } catch (error) {
+            document.getElementById(loadingId).innerHTML = `<p class="text-red-500 mt-1">Error connecting to Brain.</p>`;
+        }
+    }
+</script>
+</body></html>
