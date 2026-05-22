@@ -1,55 +1,39 @@
-from duckduckgo_search import DDGS
 import asyncio
+from duckduckgo_search import DDGS
 from crawl4ai import AsyncWebCrawler
 
-def search_web(query, max_results=5):
-    """Searches DuckDuckGo and returns a list of URLs and snippets."""
-    print(f"Searching the web for: '{query}'")
-    results = []
+def search_web(query: str, max_results: int = 3):
+    """Searches DuckDuckGo using the HTML backend to bypass Render IP blocks."""
+    print(f"\n[Limbus] Searching web for: {query}")
     try:
-        # Using the updated DDGS client
-        search_results = list(DDGS().text(query, max_results=max_results))
-        
-        if not search_results:
-            print("DuckDuckGo returned no results. It might be rate-limiting.")
+        with DDGS() as ddgs:
+            # backend="html" is the secret to bypassing datacenter restrictions
+            results = list(ddgs.text(query, backend="html", max_results=max_results))
             
-        for r in search_results:
-            results.append({
-                "title": r.get("title", ""),
-                "url": r.get("href", ""),
-                "snippet": r.get("body", "")
-            })
-        return results
+            if not results:
+                print(f"[WARNING] DuckDuckGo returned empty for query: {query}")
+            return results
+            
     except Exception as e:
-        print(f"Error searching web: {e}")
+        print(f"[ERROR] DuckDuckGo Search Failed: {e}")
         return []
 
-async def scrape_website(url):
-    """Visits a URL and extracts clean Markdown text using Crawl4AI."""
-    print(f"Reading website: {url}")
+async def read_website_async(url: str):
+    """Asynchronously scrapes a website using crawl4ai."""
+    print(f"[Limbus] Scraping URL: {url}")
     try:
         async with AsyncWebCrawler(verbose=True) as crawler:
             result = await crawler.arun(url=url)
             return result.markdown
     except Exception as e:
-        print(f"Error scraping {url}: {e}")
-        return "Could not read this website."
+        print(f"[ERROR] Scraping Failed for {url}: {e}")
+        return "Error: Could not scrape website data."
 
-def read_website(url):
-    """Helper function to run the async scraper in our sync code."""
-    return asyncio.run(scrape_website(url))
-
-if __name__ == "__main__":
-    # Test block
-    test_query = "What is an AI Agent?"
-    print("Testing Search...")
-    search_data = search_web(test_query, max_results=2)
-    print("Search Results:", search_data)
-    
-    if search_data:
-        print("\nSearch successful! Testing Scraper on the first result...")
-        first_url = search_data[0]['url']
-        page_text = read_website(first_url)
-        print(f"\nExtracted Text (First 500 chars):\n{page_text[:500]}...")
-    else:
-        print("\nSearch failed to find links. Skipping scraper test.")
+def read_website(url: str):
+    """Synchronous wrapper so your agent.py can call it easily without await."""
+    try:
+        return asyncio.run(read_website_async(url))
+    except RuntimeError:
+        # Handles cases where the FastAPI event loop is already running
+        loop = asyncio.get_event_loop()
+        return loop.run_until_complete(read_website_async(url))
