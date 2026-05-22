@@ -30,4 +30,5 @@ async def api_research(request: ResearchRequest):
         result = run_limbus_research(request.prompt)
         return {"response": result}
     except Exception as e:
+        print(f"[CRITICAL ERROR] API failed: {e}")
         raise HTTPException(status_code=500, detail=str(e))
