@@ -5,5 +5,5 @@ google-genai
 python-dotenv
 requests
 beautifulsoup4
-duckduckgo-search
 crawl4ai
+tavily-python
