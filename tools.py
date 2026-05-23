@@ -2,12 +2,27 @@ import os
 import asyncio
 from tavily import TavilyClient
 from crawl4ai import AsyncWebCrawler
+import subprocess # NEW IMPORT
 
 # Initialize Tavily
 tavily_client = TavilyClient(api_key=os.environ.get("TAVILY_API_KEY"))
 
+# NEW FUNCTION: Forces Playwright to install the browser
+def ensure_playwright_installed():
+    print("[Limbus] Checking Playwright browser installation...")
+    try:
+        # Runs the install command directly through Python
+        subprocess.run(["playwright", "install", "chromium"], check=True)
+        print("[Limbus] Playwright browser is ready.")
+    except Exception as e:
+        print(f"[ERROR] Failed to install Playwright browser: {e}")
+
 def search_web(query: str, max_results: int = 3):
-    """Searches the web using Tavily API (Built for AI Agents)."""
+    """Searches the web using Tavily API."""
+    
+    # RUN THE CHECK EVERY TIME WE SEARCH
+    ensure_playwright_installed()
+    
     print(f"\n[Limbus] Searching Tavily for: {query}")
     try:
         response = tavily_client.search(query=query, max_results=max_results)
