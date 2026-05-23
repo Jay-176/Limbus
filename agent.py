@@ -10,7 +10,7 @@ async def run_limbus_research(prompt: str) -> str:
     """The main orchestration loop for the Limbus AI Agent."""
     print(f"\n[Limbus Brain] Initialized research goal: '{prompt}'")
 
-    # 1. Search the web using the Tavily tool
+    # 1. Search the web using the Tavily tool (now using advanced depth)
     search_results = search_web(prompt, max_results=3)
 
     if not search_results:
@@ -18,12 +18,11 @@ async def run_limbus_research(prompt: str) -> str:
 
     compiled_research = ""
 
-    # 2. Process the text data Tavily ALREADY extracted
+    # 2. Process the text data Tavily extracted
     for i, result in enumerate(search_results):
         link = result.get('href', result.get('url', ''))
         title = result.get('title', 'Unknown Source')
         
-        # Grab the pre-scraped content provided by Tavily!
         body_text = result.get('body', 'No content extracted.')
 
         if not link:
@@ -31,14 +30,14 @@ async def run_limbus_research(prompt: str) -> str:
 
         print(f"[Limbus Brain] Processing source {i+1}: {title}")
 
-        # Append to our giant research document instantly
         compiled_research += f"### Source: {title}\n**URL:** {link}\n**Content:**\n{body_text}\n\n---\n\n"
 
-    # 3. Analyze the data and generate the final report
     print("[Limbus Brain] All data collected. Generating final report...")
     
+    # UPDATED: We explicitly tell Limbus to write a detailed, multi-paragraph report
     system_instruction = """You are Limbus, an advanced, autonomous AI research assistant. 
-    Your job is to read the provided web search data and synthesize it into a clean, highly readable Markdown report answering the user's prompt.
+    Write a highly detailed, comprehensive, and expansive Markdown report answering the user's prompt based on the provided web data. 
+    Ensure the report spans multiple paragraphs, breaks down complex topics, provides deep context, and connects ideas logically.
     Always cite your sources at the bottom using inline links, like [Source Name](URL)."""
 
     try:
@@ -51,7 +50,7 @@ async def run_limbus_research(prompt: str) -> str:
             ],
             config=types.GenerateContentConfig(
                 system_instruction=system_instruction,
-                temperature=0.3,
+                temperature=0.6, # UPDATED: Raised from 0.3 for more expansive writing
             )
         )
         print("[Limbus Brain] Report generated successfully.")
