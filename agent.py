@@ -1,17 +1,16 @@
 import os
 from google import genai
 from google.genai import types
-from tools import search_web, read_website
+from tools import search_web, read_website_async
 
 # Initialize the Gemini Client
-# This automatically grabs the GEMINI_API_KEY from your Render Environment Variables
 client = genai.Client()
 
-def run_limbus_research(prompt: str) -> str:
+async def run_limbus_research(prompt: str) -> str:
     """The main orchestration loop for the Limbus AI Agent."""
     print(f"\n[Limbus Brain] Initialized research goal: '{prompt}'")
 
-    # 1. Search the web using the new Tavily tool
+    # 1. Search the web using the Tavily tool
     search_results = search_web(prompt, max_results=3)
 
     if not search_results:
@@ -21,18 +20,16 @@ def run_limbus_research(prompt: str) -> str:
 
     # 2. Scrape the content from the discovered websites
     for i, result in enumerate(search_results):
-        # THE CRITICAL FIX: Safely grab 'href' from the Tavily dictionary
         link = result.get('href', result.get('url', ''))
         title = result.get('title', 'Unknown Source')
 
         if not link:
-            print(f"[WARNING] Skipping a result because no valid link was found.")
             continue
 
         print(f"[Limbus Brain] Scraping source {i+1}: {title} ({link})")
         
-        # Call the synchronous wrapper from tools.py
-        page_content = read_website(link)
+        # AWAIT the asynchronous scraper
+        page_content = await read_website_async(link)
 
         # Truncate to ~5000 characters so we don't overwhelm Gemini's context window
         if len(page_content) > 5000:
