@@ -51,7 +51,8 @@ async def run_limbus_research(prompt: str) -> str:
             model='gemini-2.5-flash',
             contents=[
                 types.Content(role="user", parts=[
-                    types.Part.from_text(f"User Request: {prompt}\n\nRaw Web Data:\n{compiled_research}")
+                    # THE FIX: Explicitly assigning the string to the 'text' parameter
+                    types.Part.from_text(text=f"User Request: {prompt}\n\nRaw Web Data:\n{compiled_research}")
                 ])
             ],
             config=types.GenerateContentConfig(
