@@ -2,30 +2,34 @@ import os
 import asyncio
 from tavily import TavilyClient
 from crawl4ai import AsyncWebCrawler
-import subprocess # NEW IMPORT
+import subprocess
 
 # Initialize Tavily
 tavily_client = TavilyClient(api_key=os.environ.get("TAVILY_API_KEY"))
 
-# NEW FUNCTION: Forces Playwright to install the browser
 def ensure_playwright_installed():
+    """Forces Playwright to install the browser (Kept for fallback purposes)."""
     print("[Limbus] Checking Playwright browser installation...")
     try:
-        # Runs the install command directly through Python
         subprocess.run(["playwright", "install", "chromium"], check=True)
         print("[Limbus] Playwright browser is ready.")
     except Exception as e:
         print(f"[ERROR] Failed to install Playwright browser: {e}")
 
 def search_web(query: str, max_results: int = 3):
-    """Searches the web using Tavily API."""
+    """Searches the web using Tavily API with advanced depth for better context."""
     
-    # RUN THE CHECK EVERY TIME WE SEARCH
+    # We keep this just in case you ever want to switch back to deep scraping
     ensure_playwright_installed()
     
     print(f"\n[Limbus] Searching Tavily for: {query}")
     try:
-        response = tavily_client.search(query=query, max_results=max_results)
+        # ADDED search_depth="advanced" right here
+        response = tavily_client.search(
+            query=query, 
+            max_results=max_results,
+            search_depth="advanced" 
+        )
         
         formatted_results = []
         for result in response.get("results", []):
@@ -42,7 +46,7 @@ def search_web(query: str, max_results: int = 3):
         return []
 
 async def read_website_async(url: str):
-    """Asynchronously scrapes a website using crawl4ai."""
+    """Asynchronously scrapes a website using crawl4ai (Currently bypassed for speed)."""
     print(f"[Limbus] Scraping URL: {url}")
     try:
         async with AsyncWebCrawler(verbose=True) as crawler:
