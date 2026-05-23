@@ -16,7 +16,7 @@ def search_web(query: str, max_results: int = 3):
         for result in response.get("results", []):
             formatted_results.append({
                 "title": result.get("title", ""),
-                "href": result.get("url", ""), # This fixes your KeyError!
+                "href": result.get("url", ""),
                 "body": result.get("content", "")
             })
             
@@ -26,8 +26,8 @@ def search_web(query: str, max_results: int = 3):
         print(f"[ERROR] Tavily Search Failed: {e}")
         return []
 
-# --- KEEP YOUR EXISTING crawl4ai FUNCTIONS BELOW THIS LINE ---
 async def read_website_async(url: str):
+    """Asynchronously scrapes a website using crawl4ai."""
     print(f"[Limbus] Scraping URL: {url}")
     try:
         async with AsyncWebCrawler(verbose=True) as crawler:
@@ -36,10 +36,3 @@ async def read_website_async(url: str):
     except Exception as e:
         print(f"[ERROR] Scraping Failed for {url}: {e}")
         return "Error: Could not scrape website data."
-
-def read_website(url: str):
-    try:
-        return asyncio.run(read_website_async(url))
-    except RuntimeError:
-        loop = asyncio.get_event_loop()
-        return loop.run_until_complete(read_website_async(url))
