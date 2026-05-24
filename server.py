@@ -26,7 +26,6 @@ async def serve_frontend():
 async def api_research(request: ResearchRequest):
     """Takes the prompt from the frontend, runs the AI agent, and returns the report."""
     try:
-        # AWAIT the async agent function
         result = await run_limbus_research(request.prompt)
         return {"response": result}
     except Exception as e:
