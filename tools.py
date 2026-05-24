@@ -1,26 +1,12 @@
 import os
 import asyncio
 from tavily import TavilyClient
-from crawl4ai import AsyncWebCrawler
-import subprocess
 
 # Initialize Tavily
 tavily_client = TavilyClient(api_key=os.environ.get("TAVILY_API_KEY"))
 
-def ensure_playwright_installed():
-    """Forces Playwright to install the browser just in case."""
-    print("[Limbus] Checking Playwright browser installation...")
-    try:
-        subprocess.run(["playwright", "install", "chromium"], check=True)
-        print("[Limbus] Playwright browser is ready.")
-    except Exception as e:
-        print(f"[ERROR] Failed to install Playwright browser: {e}")
-
 def search_web(query: str, max_results: int = 3):
     """Searches the web using Tavily API with advanced depth for better context."""
-    
-    ensure_playwright_installed()
-    
     print(f"\n[Limbus] Searching Tavily for: {query}")
     try:
         # Advanced search depth enabled
@@ -44,8 +30,11 @@ def search_web(query: str, max_results: int = 3):
         print(f"[ERROR] Tavily Search Failed: {e}")
         return []
 
+# We will leave the async scraper function here just in case you ever 
+# upgrade to a paid server and want to use it again later.
 async def read_website_async(url: str):
-    """Asynchronously scrapes a website using crawl4ai (Currently bypassed for speed)."""
+    """Asynchronously scrapes a website (Currently bypassed for speed)."""
+    from crawl4ai import AsyncWebCrawler # Imported locally to save memory on boot
     print(f"[Limbus] Scraping URL: {url}")
     try:
         async with AsyncWebCrawler(verbose=True) as crawler:
