@@ -41,20 +41,18 @@
     ::-webkit-scrollbar-track { background: transparent; }
     ::-webkit-scrollbar-thumb { background: #e6e1e7; border-radius: 4px; }
     
-    /* Smooth fade in for the modal */
     .fade-in { animation: fadeIn 0.2s ease-out forwards; }
     @keyframes fadeIn {
         from { opacity: 0; transform: scale(0.95); }
         to { opacity: 1; transform: scale(1); }
     }
     
-    /* Mobile Sidebar Transition */
     .sidebar-transition { transition: transform 0.3s ease-in-out; }
 </style>
 </head>
-<body class="bg-surface text-on-surface font-body-md min-h-screen flex antialiased overflow-hidden">
+<body class="bg-surface text-on-surface font-body-md h-[100dvh] flex antialiased overflow-hidden">
 
-<header class="md:hidden fixed top-0 left-0 right-0 h-14 bg-surface-bright border-b border-outline-variant/30 flex items-center justify-between px-4 z-30">
+<header class="md:hidden fixed top-0 left-0 right-0 h-14 bg-surface-bright border-b border-outline-variant/30 flex items-center justify-between px-4 z-30 shrink-0">
     <div class="flex items-center gap-2">
         <div class="w-6 h-6">
             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" fill="none" class="w-full h-full">
@@ -74,7 +72,7 @@
 
 <div id="sidebar-overlay" onclick="toggleSidebar()" class="fixed inset-0 bg-black/50 z-30 hidden md:hidden"></div>
 
-<nav id="sidebar" class="w-[260px] h-screen fixed left-0 top-0 bg-zinc-950 border-r border-zinc-800 flex flex-col py-6 px-4 z-40 sidebar-transition -translate-x-full md:translate-x-0">
+<nav id="sidebar" class="w-[260px] h-[100dvh] fixed left-0 top-0 bg-zinc-950 border-r border-zinc-800 flex flex-col py-6 px-4 z-40 sidebar-transition -translate-x-full md:translate-x-0">
     
     <div class="flex items-center justify-between mb-12 px-2">
         <div class="flex items-center gap-3">
@@ -122,27 +120,27 @@
 
     <button onclick="openModal()" class="mt-6 pt-4 border-t border-zinc-800 flex items-center gap-3 w-full hover:bg-zinc-900 p-2 rounded-md transition-all text-left group">
         <div class="w-9 h-9 rounded-full bg-zinc-800 group-hover:bg-primary-container flex items-center justify-center text-zinc-300 group-hover:text-white font-bold text-sm transition-colors border border-zinc-700 group-hover:border-primary-container">JP</div>
-        <div class="flex-1">
-            <span class="text-sm font-medium text-zinc-100 block">Jay Pandya</span>
+        <div class="flex-1 min-w-0">
+            <span class="text-sm font-medium text-zinc-100 block truncate">Jay Pandya</span>
             <span class="text-xs text-zinc-500 block truncate">About Developer</span>
         </div>
         <span class="material-symbols-outlined text-zinc-600 group-hover:text-zinc-300 text-[18px] transition-colors">info</span>
     </button>
 </nav>
 
-<main class="flex-1 w-full md:ml-[260px] flex flex-col h-screen relative bg-surface-bright pt-14 md:pt-0">
+<main class="flex-1 w-full md:ml-[260px] flex flex-col h-[100dvh] bg-surface-bright pt-14 md:pt-0">
     
-    <div class="flex-1 overflow-y-auto p-4 md:p-8 flex flex-col items-center" id="chat-window">
-        <div id="chat-box" class="w-full md:max-w-[800px] flex flex-col gap-6 pb-32">
+    <div class="flex-1 overflow-y-auto p-4 md:p-8 flex flex-col items-center w-full" id="chat-window">
+        <div id="chat-box" class="w-full md:max-w-[800px] flex flex-col gap-6 pb-6">
             </div>
     </div>
 
-    <div class="absolute bottom-0 left-0 right-0 p-4 md:p-8 flex justify-center z-10 pointer-events-none bg-gradient-to-t from-surface-bright via-surface-bright to-transparent">
-        <div class="w-full md:max-w-[800px] pointer-events-auto">
-            <div class="bg-surface border border-outline-variant/50 shadow-lg rounded-full flex items-center p-2 transition-all duration-300 focus-within:border-sky-400 bg-white">
-                <input id="prompt-input" class="flex-1 bg-transparent border-none focus:ring-0 text-on-surface text-sm px-4 outline-none w-full" placeholder="Ask Limbus to research a topic..." type="text" onkeypress="if(event.key === 'Enter') sendPrompt()">
-                <button id="send-btn" onclick="sendPrompt()" class="p-2 bg-primary-container text-white hover:bg-primary transition-colors rounded-full ml-2 shadow-sm flex items-center justify-center h-8 w-8 shrink-0">
-                    <span class="material-symbols-outlined text-[18px] font-bold">arrow_upward</span>
+    <div class="w-full p-4 md:p-8 flex flex-col items-center shrink-0 bg-surface-bright border-t border-outline-variant/20 md:border-none z-10">
+        <div class="w-full md:max-w-[800px]">
+            <div class="bg-surface border border-outline-variant/50 shadow-sm rounded-full flex items-center p-2 transition-all duration-300 focus-within:border-sky-400 bg-white">
+                <input id="prompt-input" class="flex-1 bg-transparent border-none focus:ring-0 text-on-surface text-base px-4 outline-none w-full" placeholder="Ask Limbus to research a topic..." type="text" onkeypress="if(event.key === 'Enter') sendPrompt()">
+                <button id="send-btn" onclick="sendPrompt()" class="p-2 bg-primary-container text-white hover:bg-primary transition-colors rounded-full ml-2 shadow-sm flex items-center justify-center h-10 w-10 shrink-0">
+                    <span class="material-symbols-outlined text-[20px] font-bold">arrow_upward</span>
                 </button>
             </div>
             <div class="text-center mt-2 hidden md:block">
@@ -189,7 +187,6 @@
     const sidebar = document.getElementById('sidebar');
     const sidebarOverlay = document.getElementById('sidebar-overlay');
 
-    // Mobile Sidebar Toggle
     function toggleSidebar() {
         const isClosed = sidebar.classList.contains('-translate-x-full');
         if (isClosed) {
@@ -201,10 +198,8 @@
         }
     }
 
-    // Modal Control Functions
     function openModal() { 
         modal.classList.remove('hidden'); 
-        // Auto close sidebar on mobile when opening modal
         if(!sidebar.classList.contains('-translate-x-full')) {
             toggleSidebar();
         }
@@ -212,7 +207,6 @@
     function closeModal() { modal.classList.add('hidden'); }
     modal.addEventListener('click', function(e) { if(e.target === modal) closeModal(); });
 
-    // The Custom SVG Limbus Avatar
     const aiAvatarHTML = `
         <div class="flex-shrink-0 mt-1">
             <div class="w-8 h-8 rounded-lg bg-white border border-zinc-200 flex items-center justify-center shadow-sm p-1">
@@ -227,7 +221,6 @@
         </div>
     `;
 
-    // --- INCOGNITO MEMORY MANAGEMENT ---
     let conversation = JSON.parse(sessionStorage.getItem('limbus_history')) || [];
 
     function renderConversation() {
@@ -262,7 +255,9 @@
                 }
             });
         }
-        chatWindow.scrollTop = chatWindow.scrollHeight;
+        
+        // Scroll adjustment for mobile keyboards
+        setTimeout(() => { chatWindow.scrollTop = chatWindow.scrollHeight; }, 10);
     }
 
     function clearHistory() {
@@ -273,13 +268,11 @@
 
     renderConversation();
 
-    // --- SEND LOGIC ---
     async function sendPrompt() {
         const text = input.value.trim();
         if(!text) return;
         
-        // Unfocus keyboard on mobile after sending
-        input.blur();
+        input.blur(); // Forces mobile keyboard to close
         input.value = '';
         
         conversation.push({ role: 'user', content: text });
