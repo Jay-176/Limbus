@@ -10,7 +10,7 @@ async def run_limbus_research(prompt: str) -> str:
     """The main orchestration loop for the Limbus AI Agent."""
     print(f"\n[Limbus Brain] Initialized research goal: '{prompt}'")
 
-    # 1. Search the web using the Tavily tool (now using advanced depth)
+    # 1. Search the web using the Tavily tool
     search_results = search_web(prompt, max_results=3)
 
     if not search_results:
@@ -34,9 +34,13 @@ async def run_limbus_research(prompt: str) -> str:
 
     print("[Limbus Brain] All data collected. Generating final report...")
     
-    # UPDATED: We explicitly tell Limbus to write a detailed, multi-paragraph report
+    # 3. System Instructions with Guardrails
     system_instruction = """You are Limbus, an advanced, autonomous AI research assistant. 
-    Write a highly detailed, comprehensive, and expansive Markdown report answering the user's prompt based on the provided web data. 
+    
+    CRITICAL INSTRUCTION: First, evaluate if the provided Raw Web Data is actually relevant to the User Request. 
+    If the User Request is clearly random gibberish, or if the Web Data is completely unrelated to the intended prompt, DO NOT write a report. Instead, strictly reply with: "I couldn't find any relevant information for that specific query."
+    
+    If the data IS relevant, write a highly detailed, comprehensive, and expansive Markdown report answering the user's prompt based on the provided web data. 
     Ensure the report spans multiple paragraphs, breaks down complex topics, provides deep context, and connects ideas logically.
     Always cite your sources at the bottom using inline links, like [Source Name](URL)."""
 
@@ -50,7 +54,7 @@ async def run_limbus_research(prompt: str) -> str:
             ],
             config=types.GenerateContentConfig(
                 system_instruction=system_instruction,
-                temperature=0.6, # UPDATED: Raised from 0.3 for more expansive writing
+                temperature=0.6,
             )
         )
         print("[Limbus Brain] Report generated successfully.")
