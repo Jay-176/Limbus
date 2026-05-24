@@ -8,7 +8,7 @@ import subprocess
 tavily_client = TavilyClient(api_key=os.environ.get("TAVILY_API_KEY"))
 
 def ensure_playwright_installed():
-    """Forces Playwright to install the browser (Kept for fallback purposes)."""
+    """Forces Playwright to install the browser just in case."""
     print("[Limbus] Checking Playwright browser installation...")
     try:
         subprocess.run(["playwright", "install", "chromium"], check=True)
@@ -19,12 +19,11 @@ def ensure_playwright_installed():
 def search_web(query: str, max_results: int = 3):
     """Searches the web using Tavily API with advanced depth for better context."""
     
-    # We keep this just in case you ever want to switch back to deep scraping
     ensure_playwright_installed()
     
     print(f"\n[Limbus] Searching Tavily for: {query}")
     try:
-        # ADDED search_depth="advanced" right here
+        # Advanced search depth enabled
         response = tavily_client.search(
             query=query, 
             max_results=max_results,
